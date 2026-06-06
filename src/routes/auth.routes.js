@@ -18,6 +18,7 @@ authRouter.post("/register", authController.registerUserController);
  * @desc Login user with email and password
  * @access Public
  */
+authRouter.post("/login", authController.loginUserController);
 
 module.exports = authRouter;
 
