@@ -1,6 +1,7 @@
 const userModel = require("../models/user.model.js");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const tokenBlacklistModel = require("../models/blacklist.model.js");
 
 /**
  * @name registerUserController
@@ -15,7 +16,7 @@ async function registerUserController(req, res) {
     return res.status(400).json({
       message: "Please provide username, email and password",
     });
-   }
+  }
 
   const isUserAlreadyExists = await userModel.findOne({
     $or: [{ username }, { email }],
@@ -49,7 +50,7 @@ async function registerUserController(req, res) {
   res.status(201).json({
     message: "User registered successfully  ",
     user: {
-      id: user._id, 
+      id: user._id,
       username: user.username,
       email: user.email,
     },
@@ -59,7 +60,7 @@ async function registerUserController(req, res) {
 /**
  * @name loginUserController
  * @description login a user, expects email and password in the request body
- * @access Public   
+ * @access Public
  */
 
 async function loginUserController(req, res) {
@@ -88,7 +89,6 @@ async function loginUserController(req, res) {
 
   res.cookie("token", token);
 
-
   res.status(200).json({
     message: "User logged in successfully",
     user: {
@@ -99,4 +99,46 @@ async function loginUserController(req, res) {
   });
 }
 
-module.exports = { registerUserController, loginUserController };
+/**
+ * @name logoutUserController
+ * @description clear token from user cookies and add token in blacklist
+ * @access public
+ */
+
+async function logoutUserController(req, res) {
+  const token = req.cookies.token;
+
+  if (token) {
+    await tokenBlacklistModel.create({ token });
+  }
+
+  res.clearCookie("token");
+  res.status(200).json({
+    message: "User logged out successfully",
+  });
+}
+
+/**
+ * @name getMeController
+ * @description get user details of logged in user
+ * @access private
+ */
+
+async function getMeController(req, res) {
+  const user = await userModel.findById(req.user.id).select("-password");
+  res.status(200).json({
+    message: "User details retrieved successfully",
+    user:{
+      id: user._id,
+      username: user.username,
+      email: user.email,  
+    }
+  });
+}
+
+module.exports = {
+  registerUserController,
+  loginUserController,
+  logoutUserController,
+  getMeController
+};
