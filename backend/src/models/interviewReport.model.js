@@ -101,15 +101,18 @@ const skillGapSchema = new moongoose.Schema({
         type: String,
         required: [true, "skill is required"]
     },
+
     severity: {
         type: String,
         enum: ["low", "medium", "high"],
         required: [true, "severity is required"]
     },
-  {
-        _id: false,
+},
+
+    {
+        _id: false
     }
-});
+);
 
 const interviewReportSchema = new moongoose.Schema({
     jobDescription: {
