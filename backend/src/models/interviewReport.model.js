@@ -141,3 +141,8 @@ const interviewReportSchema = new moongoose.Schema({
 }, {
     timestamps: true
 });
+
+
+const interviewReportModel = moongoose.model("InterviewReport", interviewReportSchema);
+
+module.exports = interviewReportModel;
